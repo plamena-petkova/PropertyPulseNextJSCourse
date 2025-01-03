@@ -1,7 +1,9 @@
-const PropertyPage = () => {
+
+const PropertyPage = ({params}) => {
+
     return(
         <div className="text-2xl"> 
-           Property Page
+           Property Page {params.id}
         </div>)
 }
 
