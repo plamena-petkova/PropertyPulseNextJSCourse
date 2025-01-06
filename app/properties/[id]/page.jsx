@@ -1,6 +1,7 @@
 import PropertyDetails from "@/app/components/PropertyDetails";
 import PropertyHeaderImage from "@/app/components/PropertyHeaderImage";
 import PropertyImages from "@/app/components/PropertyImages";
+import { convertToSerializableObject } from "@/app/utils/convertToObject";
 import connectDB from "@/config/database";
 import Property from "@/models/Property";
 import Link from "next/link";
@@ -11,7 +12,8 @@ const PropertyPage = async ({ params }) => {
 
   const { id } = await params; 
 
-  const property = await Property.findById(id).lean();
+  const propertyDoc = await Property.findById(id).lean();
+  const property = convertToSerializableObject(propertyDoc);
 
   return (
     <>
