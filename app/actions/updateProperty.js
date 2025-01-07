@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "../utils/getSessionUser";
 import cloudinary from "@/config/cloudinary";
 
-async function addProperty(formData) {
+async function updateProperty(propertyId, formData) {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -18,11 +18,13 @@ async function addProperty(formData) {
 
   const { userId } = sessionUser;
 
-  //Access all values from amenities and images
+  const existingProperty = await Property.findById(propertyId);
+
+  if(existingProperty.owner.toString() !== userId) {
+    throw new Error('Current User does not own this property!')
+  }
+
   const amenities = formData.getAll("amenities");
-  const images = formData
-    .getAll("images")
-    .filter((image) => image.name !== "");
 
   const propertyData = {
     owner: userId,
@@ -51,32 +53,12 @@ async function addProperty(formData) {
     },
   };
 
-  const imageUrls = [];
+  const updatedProperty = await Property.findByIdAndUpdate(propertyId, propertyData);
 
-  for (const imageFile of images) {
-    const imageBuffer = await imageFile.arrayBuffer();
-    const imageArray = Array.from(new Uint8Array(imageBuffer));
-    const imageData = Buffer.from(imageArray);
+  revalidatePath('/', 'layout');
 
-    //Convert to base64
-    const imageBase64 = imageData.toString('base64');
-    //Make request to cloudinary
-    const result = await cloudinary.uploader.upload(
-      `data:image/png;base64,${imageBase64}`,
-      {
-        folder: "propertypulse",
-      }
-    );
-    imageUrls.push(result.secure_url);
-  }
+  redirect(`/properties/${updatedProperty.id}`)
 
-  propertyData.images = imageUrls;
-
-  const newProperty = new Property(propertyData);
-  await newProperty.save();
-
-  revalidatePath("/", "layout");
-  redirect(`/properties/${newProperty.id}`);
 }
 
-export default addProperty;
+export default updateProperty;

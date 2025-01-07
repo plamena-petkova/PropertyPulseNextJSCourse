@@ -11,7 +11,7 @@ async function deleteProperty(propertyId) {
     throw new Error("User Id is required!");
   }
 
-  const {userId}  = sessionUser;
+  const { userId } = sessionUser;
 
   const property = await Property.findById(propertyId);
 
@@ -22,9 +22,9 @@ async function deleteProperty(propertyId) {
     throw new Error("Unauthorized");
   }
 
-   //Extract Public Id from image URLS
+  //Extract Public Id from image URLS
 
-   const publicIds = property.images.map((imageUrl) => {
+  const publicIds = property.images.map((imageUrl) => {
     const parts = imageUrl.split("/");
     return parts.at(-1).split(".").at(0);
   });
@@ -32,14 +32,15 @@ async function deleteProperty(propertyId) {
   //Delete images from cloudinary
   if (publicIds.lenght > 0) {
     for (let publicId of publicIds) {
-      await cloudinary.uploader.destroy("propertypulse/" + publicId);
+      cloudinary.uploader
+        .destroy("propertypulse/" + publicId)
+        .then((result) => console.log(result));
     }
   }
 
   await property.deleteOne();
 
- revalidatePath('/', "layout")
-
+  revalidatePath("/", "layout");
 }
 
 export default deleteProperty;
