@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import 'mapbox-gl/dist/mapbox-gl'
 import { setDefaults, fromAddress } from "react-geocode";
-import Mao, { Marker } from "react-map-gl";
+import Map, { Marker } from "react-map-gl";
 import Image from "next/image";
 import pin from "@/assets/images/pin.svg";
 import Spinner from "./Spinner";
-import Map from "react-map-gl/dist/esm/components/map";
+
 
 
 const PropertyMap = ({ property }) => {
@@ -82,8 +82,8 @@ const PropertyMap = ({ property }) => {
         style={{ width: "100%", height: 500 }}
         mapStyle="mapbox://styles/mapbox/streets-v9"
       >
-         {lat && lng && (
-          <Marker longitude={lng} latitude={lat} anchor="center">
+         {(lat && lng) !== null && (
+          <Marker longitude={lng} latitude={lat} anchor="bottom">
             <Image src={pin} alt="location" width={40} height={40} />
           </Marker>
         )}

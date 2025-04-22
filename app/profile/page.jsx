@@ -10,8 +10,6 @@ const ProfilePage = async () => {
   await connectDB();
   const sessionUser = await getSessionUser();
 
-  console.log('Session', sessionUser)
-
   if (!sessionUser.user || !sessionUser.userId) {
     throw new Error("User Id is required");
   }
